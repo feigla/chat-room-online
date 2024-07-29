@@ -14,14 +14,12 @@ public class CommandHandler {
     }
 
     public static void doConnectCommand(Client client, long roomId) {
-        boolean isContained = false;
-        synchronized (client) {
-            if (Server.rooms.containsKey(roomId)) {
-                Server.rooms.get(roomId).add(client);
-                isContained = true;
-            }
+        if (client.getRoomId() == roomId) {
+            client.out.println("You are already connected");
+            return;
         }
-        if (isContained) {
+        if (Server.rooms.containsKey(roomId)) {
+            Server.rooms.get(roomId).add(client);
             Server.rooms.get(client.getRoomId()).remove(client);
             client.setRoomId(roomId);
             client.notifyConnected();
