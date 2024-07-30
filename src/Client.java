@@ -25,8 +25,8 @@ public class Client implements Runnable {
         return out;
     }
 
-    public User getUser() {
-        return user;
+    public User getUser() throws CloneNotSupportedException {
+        return user.clone();
     }
 
     public Socket getSocket() {

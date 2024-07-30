@@ -1,4 +1,4 @@
-public class User {
+public class User implements Cloneable {
     private String name;
 
     public String getName() {
@@ -11,5 +11,10 @@ public class User {
 
     public User(String name) {
         this.name = name;
+    }
+
+    @Override
+    public User clone() throws CloneNotSupportedException {
+        return (User) super.clone();
     }
 }
