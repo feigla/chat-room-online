@@ -2,6 +2,10 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class CommandHandler {
+    public static void doStopCommand(Client client) {
+        Server.rooms.get(client.getRoomId()).remove(client);
+    }
+
     public static void doCreateCommand(Client client) {
         long roomId = Room.generateRoomId();
         Server.rooms.put(roomId, new Room());
@@ -18,9 +22,15 @@ public class CommandHandler {
                 client.getOut().println("You are already connected");
                 return;
             }
-            if (Server.rooms.containsKey(roomId)) {
-                Server.rooms.get(roomId).add(client);
-                Server.rooms.get(client.getRoomId()).remove(client);
+            boolean isContained = false;
+            synchronized (Server.rooms.get(roomId)) {
+                if (Server.rooms.containsKey(roomId)) {
+                    Server.rooms.get(roomId).add(client);
+                    Server.rooms.get(client.getRoomId()).remove(client);
+                    isContained = true;
+                }
+            }
+            if (isContained) {
                 client.setRoomId(roomId);
                 client.notifyConnected();
             } else {

@@ -75,6 +75,7 @@ public class Client implements Runnable {
                 msg = in.readLine();
 
                 if (msg.startsWith(Command.STOP.commandName)) {
+                    CommandHandler.doStopCommand(this);
                     break;
                 } else if (msg.startsWith(Command.CREATE.commandName)) {
                     CommandHandler.doCreateCommand(this);

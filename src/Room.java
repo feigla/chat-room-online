@@ -1,20 +1,28 @@
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Room {
-    private List<Client> clients = new LinkedList<>();
+    private LinkedBlockingQueue<Client> clients = new LinkedBlockingQueue<>();
     private static AtomicLong modCount = new AtomicLong(1);
 
     public static long generateRoomId() {
         return modCount.getAndIncrement();
     }
 
-    public List<Client> getClients() {
-        return clients;
+    public Deque<Client> getClients() {
+        return new LinkedBlockingDeque<>(clients);
     }
+
     public void add(Client client) {
-        clients.add(client);
+        try {
+            clients.put(client);
+        } catch (InterruptedException e) {}
     }
 
     public void remove(Client client) {
