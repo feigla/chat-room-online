@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Client implements Runnable {

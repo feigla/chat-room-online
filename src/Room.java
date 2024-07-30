@@ -1,9 +1,3 @@
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -15,8 +9,8 @@ public class Room {
         return modCount.getAndIncrement();
     }
 
-    public Deque<Client> getClients() {
-        return new LinkedBlockingDeque<>(clients);
+    public LinkedBlockingQueue<Client> getClients() {
+        return new LinkedBlockingQueue<>(clients);
     }
 
     public void add(Client client) {
