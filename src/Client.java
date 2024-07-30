@@ -6,12 +6,11 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Client implements Runnable {
     private final Socket socket;
     private final BufferedReader in;
-    public final PrintWriter out;
+    private final PrintWriter out;
     private long id;
     private long roomId;
     private static AtomicLong modCount = new AtomicLong(0);
     private User user;
-    public boolean isConnected;
 
 
     public long getRoomId() {
@@ -22,6 +21,18 @@ public class Client implements Runnable {
         this.roomId = roomId;
     }
 
+    public PrintWriter getOut() {
+        return out;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
     public Client(Socket socket) throws IOException {
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -29,7 +40,6 @@ public class Client implements Runnable {
         this.id = generateId();
         this.roomId = 0; // Init room
         this.user = new User("User" + "@" + Long.toString(id));
-        this.isConnected = true;
         Server.rooms.get(roomId).add(this);
     }
 
@@ -37,19 +47,13 @@ public class Client implements Runnable {
         return modCount.incrementAndGet();
     }
 
-    public void changeName() throws IOException {
-        Scanner scanner = new Scanner(socket.getInputStream());
-        out.println("Enter a name: ");
-        user.name = scanner.nextLine();
-    }
-
     public void notifyConnected() {
         out.println("Your room is: " + roomId);
-        sendMsg("I'm connected!");
+        CommandHandler.doSendMessageCommand("I'm connected!", this);
     }
 
     public void notifyDisconnected() {
-        sendMsg("I'm disconnected!");
+        CommandHandler.doSendMessageCommand("I'm disconnected!", this);
     }
 
 
@@ -57,36 +61,25 @@ public class Client implements Runnable {
     public void run() {
         notifyConnected();
         try {
-            while (isConnected) {
+            while (true) {
                 String msg;
                 msg = in.readLine();
 
                 if (msg.startsWith(Command.STOP.commandName)) {
-                    CommandHandler.doStopCommand(this);
+                    break;
                 } else if (msg.startsWith(Command.CREATE.commandName)) {
                     CommandHandler.doCreateCommand(this);
                 } else if (msg.startsWith(Command.CONNECT.commandName)) {
-                    try {
-                        long roomId = Integer.parseInt(msg.substring(Command.CONNECT.commandName.length()).strip());
-                        CommandHandler.doConnectCommand(this, roomId);
-                    } catch (NumberFormatException e) {
-                        out.println("Invalid number");
-                    }
+                    CommandHandler.doConnectCommand(this, msg);
                 } else if (msg.startsWith(Command.CHANGE_NAME.commandName)) {
                     CommandHandler.doChangeNameCommand(this);
                 } else {
-                    sendMsg(msg);
+                    CommandHandler.doSendMessageCommand(msg, this);
                 }
             }
-        } catch (IOException e) {}
+        } catch (IOException | InterruptedException e) {}
         finally {
             notifyDisconnected();
-        }
-    }
-
-    public void sendMsg(String msg) {
-        for (Client client : Server.rooms.get(roomId).getClients()) {
-            client.out.println(user.name + ": " + msg);
         }
     }
 
