@@ -19,7 +19,7 @@ public class Server {
             Server.rooms.put(0L, new Room());
             for (int i = 0; i < COUNT_OF_USERS; i++) {
                 Socket socket = server.accept();
-                exec.execute(new Client(socket));
+                exec.execute(Client.createAndAddClient(socket));
             }
         } finally {
             server.close();

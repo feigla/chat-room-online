@@ -37,14 +37,19 @@ public class Client implements Runnable {
         return user.getName();
     }
 
-    public Client(Socket socket) throws IOException {
+    private Client(Socket socket) throws IOException {
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out =  new PrintWriter(socket.getOutputStream(), true);
         this.id = generateId();
         this.roomId = 0; // Init room
         this.user = new User("User" + "@" + Long.toString(id));
-        Server.rooms.get(roomId).add(this);
+    }
+
+    public static Client createAndAddClient(Socket socket) throws IOException {
+        Client client = new Client(socket);
+        Server.rooms.get(client.getRoomId()).add(client);
+        return client;
     }
 
     public long generateId() {
