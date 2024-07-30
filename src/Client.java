@@ -25,12 +25,16 @@ public class Client implements Runnable {
         return out;
     }
 
-    public User getUser() throws CloneNotSupportedException {
-        return user.clone();
-    }
-
     public Socket getSocket() {
         return socket;
+    }
+
+    public void setUserName(String userName) {
+        user.setName(userName);
+    }
+
+    public String getUserName() {
+        return user.getName();
     }
 
     public Client(Socket socket) throws IOException {

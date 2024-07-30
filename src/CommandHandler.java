@@ -34,13 +34,13 @@ public class CommandHandler {
     public static void doChangeNameCommand(Client client) throws IOException {
         Scanner scanner = new Scanner(client.getSocket().getInputStream());
         client.getOut().println("Enter a name: ");
-        client.getUser().setName(scanner.nextLine());
+        client.setUserName(scanner.nextLine());
         client.getOut().println("You successfully changed name!");
     }
 
     public static void doSendMessageCommand(String msg, Client client) {
         for (Client clientReceiver : Server.rooms.get(client.getRoomId()).getClients()) {
-            clientReceiver.getOut().println(client.getUser().getName() + ": " + msg);
+            clientReceiver.getOut().println(client.getUserName() + ": " + msg);
         }
     }
 }
